@@ -123,6 +123,14 @@ describe('integration', () => {
             .mockReturnValueOnce(secrets);
     }
 
+    it('prints a nice error message when secret not found', async () => {
+        mockInput(`secret/data/test secret ;
+        secret/data/test secret | NAMED_SECRET ;
+        secret/data/notFound kehe | NO_SIR ;`);
+
+        expect(exportSecrets()).rejects.toEqual(Error(`Unable to retrieve result for "secret/data/notFound". Double check your Key.`));
+    })
+
     it('get simple secret', async () => {
         mockInput('secret/data/test secret');
 

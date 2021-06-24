@@ -34,9 +34,17 @@ async function getSecrets(secretRequests, client) {
             body = responseCache.get(requestPath);
             cachedResponse = true;
         } else {
-            const result = await client.get(requestPath);
-            body = result.body;
-            responseCache.set(requestPath, body);
+            try {
+                const result = await client.get(requestPath);
+                body = result.body;
+                responseCache.set(requestPath, body);
+            } catch (error) {
+                const {response} = error;
+                if (response.statusCode === 404) {
+                    throw Error(`Unable to retrieve result for "${path}". Double check your Key.`)
+                }
+                throw error
+            }
         }
         if (!selector.match(/.*[\.].*/)) {
             selector = '"' + selector + '"'
